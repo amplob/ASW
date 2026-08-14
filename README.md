@@ -2,8 +2,7 @@
 
 Grau en Enginyeria Informàtica · FIB · UPC
 
-Fitxer inicial de la carpeta de teoria. Recull i introdueix els **continguts**
-oficials de l'assignatura, tal com apareixen a la
+ **Continguts** oficials de l'assignatura, tal com apareixen a la
 [fitxa de l'assignatura a la web de la FIB](https://www.fib.upc.edu/ca/graus/grau-en-enginyeria-informatica/pla-destudis/assignatures/ASW).
 
 L'assignatura tracta com es construeixen sistemes que s'executen *sobre el Web*:
