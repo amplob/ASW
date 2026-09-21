@@ -1,60 +1,48 @@
-ASW - SEGUIMENT DE LA NOTA,,,,,,
-Edita nomes la columna NOTA (0-10). Deixa-la buida si encara no la tens; la resta es calcula sol.,,,,,,
-,,,,,,
-CONFIG,"Nombre de quizzes anunciat a classe (N, entre 5 i 7)",6,,,,
-,Quizzes que compten (N-2),=C4-2,,,,
-,,,,,,
-ITEM,DESCRIPCIO,NOTA (0-10),EN JOC,OBTINGUTS,AVALUATS,PENDENTS
-C1,Primer control de teoria,,1,"=IF(ISBLANK(C8),0,C8/10*D8)","=IF(ISBLANK(C8),0,D8)",=D8-F8
-C2,Segon control de teoria,,1,"=IF(ISBLANK(C9),0,C9/10*D9)","=IF(ISBLANK(C9),0,D9)",=D9-F9
-NQ,"Quizzes a classe (automatic, mira el bloc de sota)","=IF($C$32=0,"""",$C$31/$C$32)",1,"=IF($C$32=0,0,$C$31/$C$5/10*D10)",=$C$32/$C$5*D10,=D10-F10
-P1,"Presentacio 1 (grup, nota personalitzada)",,1,"=IF(ISBLANK(C11),0,C11/10*D11)","=IF(ISBLANK(C11),0,D11)",=D11-F11
-P2,"Presentacio 2 (grup, nota personalitzada)",,1,"=IF(ISBLANK(C12),0,C12/10*D12)","=IF(ISBLANK(C12),0,D12)",=D12-F12
-IntroLAB,Sessions introductories a les tecnologies web,,1.5,"=IF(ISBLANK(C13),0,C13/10*D13)","=IF(ISBLANK(C13),0,D13)",=D13-F13
-Project,"Projecte (grup, nota personalitzada)",,3.5,"=IF(ISBLANK(C14),0,C14/10*D14)","=IF(ISBLANK(C14),0,D14)",=D14-F14
-,,,,,,
-QUIZZES,Apunta la nota de cada quiz que facis,NOTA (0-10),,,,
-Q1,Quiz 1,,,,,
-Q2,Quiz 2,,,,,
-Q3,Quiz 3,,,,,
-Q4,Quiz 4,,,,,
-Q5,Quiz 5,,,,,
-Q6,Quiz 6,,,,,
-Q7,Quiz 7  (nomes si N=7),,,,,
-,,,,,,
-CALCUL DE NQ,Compten les N-2 millors; les places buides compten com un zero,VALOR,COMPTA?,SUMA,,
-1a millor,,"=IF(COUNT($C$17:$C$23)>=1,LARGE($C$17:$C$23,1),"""")","=IF(AND(COUNT($C$17:$C$23)>=1,1<=$C$5),""si"",""no"")","=IF(D26=""si"",C26,0)",,
-2a millor,,"=IF(COUNT($C$17:$C$23)>=2,LARGE($C$17:$C$23,2),"""")","=IF(AND(COUNT($C$17:$C$23)>=2,2<=$C$5),""si"",""no"")","=IF(D27=""si"",C27,0)",,
-3a millor,,"=IF(COUNT($C$17:$C$23)>=3,LARGE($C$17:$C$23,3),"""")","=IF(AND(COUNT($C$17:$C$23)>=3,3<=$C$5),""si"",""no"")","=IF(D28=""si"",C28,0)",,
-4a millor,,"=IF(COUNT($C$17:$C$23)>=4,LARGE($C$17:$C$23,4),"""")","=IF(AND(COUNT($C$17:$C$23)>=4,4<=$C$5),""si"",""no"")","=IF(D29=""si"",C29,0)",,
-5a millor,,"=IF(COUNT($C$17:$C$23)>=5,LARGE($C$17:$C$23,5),"""")","=IF(AND(COUNT($C$17:$C$23)>=5,5<=$C$5),""si"",""no"")","=IF(D30=""si"",C30,0)",,
-Suma de les que compten,,=SUM(E26:E30),,,,
-Places omplertes (de N-2),,"=MIN(COUNT($C$17:$C$23),$C$5)",,,,
-NQ  =  suma / (N-2),,"=IF($C$32=0,"""",$C$31/$C$5)",,,,
-,,,,,,
-RESUM,,NOTA,EN JOC,OBTINGUTS,AVALUATS,PENDENTS
-NTP,Teoria i exercicis (50% de la nota final),"=IF(F36=0,"""",E36/F36*10)",=SUM(D8:D12),=SUM(E8:E12),=SUM(F8:F12),=SUM(G8:G12)
-NLAB,Laboratori (50% de la nota final),"=IF(F37=0,"""",E37/F37*10)",=SUM(D13:D14),=SUM(E13:E14),=SUM(F13:F14),=SUM(G13:G14)
-NOTA FINAL,50% NTP + 50% NLAB,"=IF(F38=0,"""",E38/F38*10)",=SUM(D8:D14),=SUM(E8:E14),=SUM(F8:F14),=SUM(G8:G14)
-,,,,,,
-INDICADORS,,VALOR,,,,
-Punts acumulats,"Els que ja tens a la butxaca, sobre 10",=$E$38,,,,
-Punts encara en joc,El que et queda per jugar,=$G$38,,,,
-Mitjana del que ja s'ha avaluat,No es la nota final: nomes el que s'ha jugat,"=IF($F$38=0,"""",$E$38/$F$38*10)",,,,
-Nota final minima possible,Si a partir d'ara treus un 0 a tot,=$E$38,,,,
-Nota final maxima possible,Si a partir d'ara treus un 10 a tot,=$E$38+$G$38,,,,
-,,,,,,
-QUE EM CAL,Mitjana necessaria a TOT el que queda,NOTA NECESSARIA,,,,
-Per aprovar (5),,"=IF($G$38=0,""-"",IF((5-$E$38)/$G$38*10<=0,""ja el tens"",IF((5-$E$38)/$G$38*10>10,""inassolible"",(5-$E$38)/$G$38*10)))",,,,
-Per treure notable (7),,"=IF($G$38=0,""-"",IF((7-$E$38)/$G$38*10<=0,""ja el tens"",IF((7-$E$38)/$G$38*10>10,""inassolible"",(7-$E$38)/$G$38*10)))",,,,
-Per treure excel.lent (9),,"=IF($G$38=0,""-"",IF((9-$E$38)/$G$38*10<=0,""ja el tens"",IF((9-$E$38)/$G$38*10>10,""inassolible"",(9-$E$38)/$G$38*10)))",,,,
-,,,,,,
-COM FUNCIONA,,,,,,
-Formula,Nota final = 50% NTP + 50% NLAB,,,,,
-,NTP  = 20% C1 + 20% C2 + 20% NQ + 20% P1 + 20% P2,,,,,
-,NLAB = 30% IntroLAB + 70% Project,,,,,
-Quizzes,"NQ = suma de les min(lliurades, N-2) millors, dividida sempre per N-2.",,,,,
-,"Si n'has fet N-2 o mes: mitjana de les N-2 millors. Si n'has fet N-3 o menys,",,,,,
-,les places buides compten com un zero. Canvia N a la fila 4 si a classe,,,,,
-,"n'anuncien un altre numero, i deixa en blanc les files Q que no facis servir.",,,,,
-Grups,"P1, P2 i Project son en grup pero la nota es personalitzada: hi poses la teva.",,,,,
+﻿ASW — SEGUIMENT DE LA NOTA,,,,,
+Omple la TAULA 1. La TAULA 2 es calcula sola.,,,,,
+,,,,,
+TAULA 1 — NOTES,Escriu-hi les notes (0-10). Deixa en blanc el que encara no tinguis.,,,,
+ITEM,DESCRIPCIÓ,NOTA,,,
+C1,Primer control de teoria,,,,
+C2,Segon control de teoria,,,,
+Q1,Quiz 1,,,,
+Q2,Quiz 2,,,,
+Q3,Quiz 3,,,,
+Q4,Quiz 4,,,,
+Q5,Quiz 5,,,,
+Q6,Quiz 6,,,,
+Q7,"Quiz 7   (si aquest quiz no arriba a existir, posa-hi un 0)",,,,
+P1,Presentació 1   (grup: hi va la teva nota personalitzada),,,,
+P2,Presentació 2   (grup: hi va la teva nota personalitzada),,,,
+L1,IntroLAB — sessió 1,,,,
+L2,IntroLAB — sessió 2,,,,
+L3,IntroLAB — sessió 3,,,,
+L4,IntroLAB — sessió 4,,,,
+PJ1,Projecte — entrega 1   (grup: nota personalitzada),,,,
+PJ2,Projecte — entrega 2   (grup: nota personalitzada),,,,
+,,,,,
+TAULA 2 — RESUM,Es calcula sol. No cal tocar-hi res.,,,,
+CONCEPTE,NOTA,EN JOC,OBTINGUTS,AVALUATS,PENDENTS
+C1,"=IF(E26=0,"""",D26/E26*10)",1,"=IF(ISBLANK($C$6),0,$C$6/10*C26)","=IF(ISBLANK($C$6),0,C26)",=C26-E26
+C2,"=IF(E27=0,"""",D27/E27*10)",1,"=IF(ISBLANK($C$7),0,$C$7/10*C27)","=IF(ISBLANK($C$7),0,C27)",=C27-E27
+NQ  (les 5 millors de 7 quizzes),"=IF(E28=0,"""",D28/E28*10)",1,"=(IFERROR(LARGE($C$8:$C$14,1),0)+IFERROR(LARGE($C$8:$C$14,2),0)+IFERROR(LARGE($C$8:$C$14,3),0)+IFERROR(LARGE($C$8:$C$14,4),0)+IFERROR(LARGE($C$8:$C$14,5),0))/5/10*C28","=MIN(COUNT($C$8:$C$14),5)/5*C28",=C28-E28
+P1,"=IF(E29=0,"""",D29/E29*10)",1,"=IF(ISBLANK($C$15),0,$C$15/10*C29)","=IF(ISBLANK($C$15),0,C29)",=C29-E29
+P2,"=IF(E30=0,"""",D30/E30*10)",1,"=IF(ISBLANK($C$16),0,$C$16/10*C30)","=IF(ISBLANK($C$16),0,C30)",=C30-E30
+IntroLAB  (mitjana de les 4 sessions),"=IF(E31=0,"""",D31/E31*10)",1.5,=SUM($C$17:$C$20)/4/10*C31,=COUNT($C$17:$C$20)/4*C31,=C31-E31
+Project  (mitjana de les 2 entregues),"=IF(E32=0,"""",D32/E32*10)",3.5,=SUM($C$21:$C$22)/2/10*C32,=COUNT($C$21:$C$22)/2*C32,=C32-E32
+NTP  =  20% (C1+C2+NQ+P1+P2),"=IF(E33=0,"""",D33/E33*10)",=SUM(C26:C30),=SUM(D26:D30),=SUM(E26:E30),=SUM(F26:F30)
+NLAB  =  30% IntroLAB + 70% Project,"=IF(E34=0,"""",D34/E34*10)",=SUM(C31:C32),=SUM(D31:D32),=SUM(E31:E32),=SUM(F31:F32)
+NOTA FINAL  =  50% NTP + 50% NLAB,"=IF(E35=0,"""",D35/E35*10)",=SUM(C26:C32),=SUM(D26:D32),=SUM(E26:E32),=SUM(F26:F32)
+Punts que ja tens,=$D$35,,,,
+Punts encara en joc,=$F$35,,,,
+Nota final mínima possible  (si ho suspens tot),=$D$35,,,,
+Nota final màxima possible  (si ho claves tot),=$D$35+$F$35,,,,
+Nota que et cal a tot el que queda per aprovar (5),"=IF($F$35=0,""-"",IF((5-$D$35)/$F$35*10<=0,""ja el tens"",IF((5-$D$35)/$F$35*10>10,""inassolible"",(5-$D$35)/$F$35*10)))",,,,
+Nota que et cal a tot el que queda per treure notable (7),"=IF($F$35=0,""-"",IF((7-$D$35)/$F$35*10<=0,""ja el tens"",IF((7-$D$35)/$F$35*10>10,""inassolible"",(7-$D$35)/$F$35*10)))",,,,
+Nota que et cal a tot el que queda per treure excel·lent (9),"=IF($F$35=0,""-"",IF((9-$D$35)/$F$35*10<=0,""ja el tens"",IF((9-$D$35)/$F$35*10>10,""inassolible"",(9-$D$35)/$F$35*10)))",,,,
+,,,,,
+COM ES CALCULA,,,,,
+Quizzes,"Compten les 5 millors de les 7. La que no facis o no arribi a existir, posa-hi un 0.",,,,
+IntroLAB,Mitjana de les 4 sessions.   Project: mitjana de les 2 entregues.,,,,
+NOTA,"A la taula 2 és la nota que portes de cada concepte, comptant només el que ja s'ha avaluat.",,,,
+EN JOC,Quant val cada cosa en punts de la nota final (sobre 10).,,,,
