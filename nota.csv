@@ -1,0 +1,60 @@
+ASW - SEGUIMENT DE LA NOTA,,,,,,
+Edita nomes la columna NOTA (0-10). Deixa-la buida si encara no la tens; la resta es calcula sol.,,,,,,
+,,,,,,
+CONFIG,"Nombre de quizzes anunciat a classe (N, entre 5 i 7)",6,,,,
+,Quizzes que compten (N-2),=C4-2,,,,
+,,,,,,
+ITEM,DESCRIPCIO,NOTA (0-10),EN JOC,OBTINGUTS,AVALUATS,PENDENTS
+C1,Primer control de teoria,,1,"=IF(ISBLANK(C8),0,C8/10*D8)","=IF(ISBLANK(C8),0,D8)",=D8-F8
+C2,Segon control de teoria,,1,"=IF(ISBLANK(C9),0,C9/10*D9)","=IF(ISBLANK(C9),0,D9)",=D9-F9
+NQ,"Quizzes a classe (automatic, mira el bloc de sota)","=IF($C$32=0,"""",$C$31/$C$32)",1,"=IF($C$32=0,0,$C$31/$C$5/10*D10)",=$C$32/$C$5*D10,=D10-F10
+P1,"Presentacio 1 (grup, nota personalitzada)",,1,"=IF(ISBLANK(C11),0,C11/10*D11)","=IF(ISBLANK(C11),0,D11)",=D11-F11
+P2,"Presentacio 2 (grup, nota personalitzada)",,1,"=IF(ISBLANK(C12),0,C12/10*D12)","=IF(ISBLANK(C12),0,D12)",=D12-F12
+IntroLAB,Sessions introductories a les tecnologies web,,1.5,"=IF(ISBLANK(C13),0,C13/10*D13)","=IF(ISBLANK(C13),0,D13)",=D13-F13
+Project,"Projecte (grup, nota personalitzada)",,3.5,"=IF(ISBLANK(C14),0,C14/10*D14)","=IF(ISBLANK(C14),0,D14)",=D14-F14
+,,,,,,
+QUIZZES,Apunta la nota de cada quiz que facis,NOTA (0-10),,,,
+Q1,Quiz 1,,,,,
+Q2,Quiz 2,,,,,
+Q3,Quiz 3,,,,,
+Q4,Quiz 4,,,,,
+Q5,Quiz 5,,,,,
+Q6,Quiz 6,,,,,
+Q7,Quiz 7  (nomes si N=7),,,,,
+,,,,,,
+CALCUL DE NQ,Compten les N-2 millors; les places buides compten com un zero,VALOR,COMPTA?,SUMA,,
+1a millor,,"=IF(COUNT($C$17:$C$23)>=1,LARGE($C$17:$C$23,1),"""")","=IF(AND(COUNT($C$17:$C$23)>=1,1<=$C$5),""si"",""no"")","=IF(D26=""si"",C26,0)",,
+2a millor,,"=IF(COUNT($C$17:$C$23)>=2,LARGE($C$17:$C$23,2),"""")","=IF(AND(COUNT($C$17:$C$23)>=2,2<=$C$5),""si"",""no"")","=IF(D27=""si"",C27,0)",,
+3a millor,,"=IF(COUNT($C$17:$C$23)>=3,LARGE($C$17:$C$23,3),"""")","=IF(AND(COUNT($C$17:$C$23)>=3,3<=$C$5),""si"",""no"")","=IF(D28=""si"",C28,0)",,
+4a millor,,"=IF(COUNT($C$17:$C$23)>=4,LARGE($C$17:$C$23,4),"""")","=IF(AND(COUNT($C$17:$C$23)>=4,4<=$C$5),""si"",""no"")","=IF(D29=""si"",C29,0)",,
+5a millor,,"=IF(COUNT($C$17:$C$23)>=5,LARGE($C$17:$C$23,5),"""")","=IF(AND(COUNT($C$17:$C$23)>=5,5<=$C$5),""si"",""no"")","=IF(D30=""si"",C30,0)",,
+Suma de les que compten,,=SUM(E26:E30),,,,
+Places omplertes (de N-2),,"=MIN(COUNT($C$17:$C$23),$C$5)",,,,
+NQ  =  suma / (N-2),,"=IF($C$32=0,"""",$C$31/$C$5)",,,,
+,,,,,,
+RESUM,,NOTA,EN JOC,OBTINGUTS,AVALUATS,PENDENTS
+NTP,Teoria i exercicis (50% de la nota final),"=IF(F36=0,"""",E36/F36*10)",=SUM(D8:D12),=SUM(E8:E12),=SUM(F8:F12),=SUM(G8:G12)
+NLAB,Laboratori (50% de la nota final),"=IF(F37=0,"""",E37/F37*10)",=SUM(D13:D14),=SUM(E13:E14),=SUM(F13:F14),=SUM(G13:G14)
+NOTA FINAL,50% NTP + 50% NLAB,"=IF(F38=0,"""",E38/F38*10)",=SUM(D8:D14),=SUM(E8:E14),=SUM(F8:F14),=SUM(G8:G14)
+,,,,,,
+INDICADORS,,VALOR,,,,
+Punts acumulats,"Els que ja tens a la butxaca, sobre 10",=$E$38,,,,
+Punts encara en joc,El que et queda per jugar,=$G$38,,,,
+Mitjana del que ja s'ha avaluat,No es la nota final: nomes el que s'ha jugat,"=IF($F$38=0,"""",$E$38/$F$38*10)",,,,
+Nota final minima possible,Si a partir d'ara treus un 0 a tot,=$E$38,,,,
+Nota final maxima possible,Si a partir d'ara treus un 10 a tot,=$E$38+$G$38,,,,
+,,,,,,
+QUE EM CAL,Mitjana necessaria a TOT el que queda,NOTA NECESSARIA,,,,
+Per aprovar (5),,"=IF($G$38=0,""-"",IF((5-$E$38)/$G$38*10<=0,""ja el tens"",IF((5-$E$38)/$G$38*10>10,""inassolible"",(5-$E$38)/$G$38*10)))",,,,
+Per treure notable (7),,"=IF($G$38=0,""-"",IF((7-$E$38)/$G$38*10<=0,""ja el tens"",IF((7-$E$38)/$G$38*10>10,""inassolible"",(7-$E$38)/$G$38*10)))",,,,
+Per treure excel.lent (9),,"=IF($G$38=0,""-"",IF((9-$E$38)/$G$38*10<=0,""ja el tens"",IF((9-$E$38)/$G$38*10>10,""inassolible"",(9-$E$38)/$G$38*10)))",,,,
+,,,,,,
+COM FUNCIONA,,,,,,
+Formula,Nota final = 50% NTP + 50% NLAB,,,,,
+,NTP  = 20% C1 + 20% C2 + 20% NQ + 20% P1 + 20% P2,,,,,
+,NLAB = 30% IntroLAB + 70% Project,,,,,
+Quizzes,"NQ = suma de les min(lliurades, N-2) millors, dividida sempre per N-2.",,,,,
+,"Si n'has fet N-2 o mes: mitjana de les N-2 millors. Si n'has fet N-3 o menys,",,,,,
+,les places buides compten com un zero. Canvia N a la fila 4 si a classe,,,,,
+,"n'anuncien un altre numero, i deixa en blanc les files Q que no facis servir.",,,,,
+Grups,"P1, P2 i Project son en grup pero la nota es personalitzada: hi poses la teva.",,,,,
