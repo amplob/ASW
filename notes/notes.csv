@@ -1,0 +1,17 @@
+bloc,item,descripcio,pes_bloc_pct,nota
+CONFIG,N_QUIZZES,Nombre de quizzes anunciats el primer dia de classe (entre 5 i 7),,6
+FINAL,NTP,Teoria i exercicis,50,
+FINAL,NLAB,Laboratori,50,
+NTP,C1,Primer control de teoria,20,
+NTP,C2,Segon control de teoria,20,
+NTP,NQ,Quizzes a classe (es calcula sol a partir de les files QUIZ),20,
+NTP,P1,Presentacio 1 (treball en grup),20,
+NTP,P2,Presentacio 2 (treball en grup),20,
+NLAB,IntroLAB,Sessions introductories a les tecnologies web,30,
+NLAB,Project,Projecte (treball en grup),70,
+QUIZ,Q1,Quiz 1,,
+QUIZ,Q2,Quiz 2,,
+QUIZ,Q3,Quiz 3,,
+QUIZ,Q4,Quiz 4,,
+QUIZ,Q5,Quiz 5,,
+QUIZ,Q6,Quiz 6,,
