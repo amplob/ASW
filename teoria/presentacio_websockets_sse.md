@@ -27,7 +27,7 @@ lliurar.
 
 ---
 
-## 2. Els apanys anteriors
+## 2. D'on venen: evolució i apanys anteriors
 
 Abans que existís res estàndard, el *push* se simulava amb peticions del client.
 
@@ -62,6 +62,26 @@ Va ser el que va fer possible el xat de Gmail i tota l'onada "Comet" dels anys
 
 **Totes dues tècniques imiten el push amb peticions del client.** Funcionen,
 però són un pedaç. Avui tenim dos protocols pensats expressament per a això.
+
+### Cronologia
+
+Una cosa que crida l'atenció: **SSE es va concebre abans però es va
+estandarditzar després**. WebSockets neix el 2008 i ja té RFC el 2011; SSE ve
+del 2004–2006 i no arriba a Recomanació del W3C fins al 2015.
+
+| Any | Fita |
+| --- | --- |
+| 2004–2006 | Ian Hickson especifica els *server-sent DOM events* dins la proposta Web Applications 1.0 del WHATWG. **Opera** n'implementa una versió experimental (Opera 9) |
+| ~2005–2008 | Època dels pedaços: AJAX fa possible el *polling* i el *long polling* (Comet), però no hi ha push de debò |
+| 2008 | Michael Carter i Ian Hickson encunyen el nom **WebSocket** |
+| 2010 | El treball de WebSocket passa al **IETF**. Els primers navegadors l'implementen amb esborranys **incompatibles entre si** (draft-75 i draft-76) |
+| Desembre 2011 | **RFC 6455**: WebSocket queda estandarditzat, versió 13. És la que fem servir avui |
+| 2010–2011 | Chrome, Safari i Firefox implementen SSE. L'API es redissenya d'un element a l'objecte `EventSource` |
+| Febrer 2015 | **Recomanació del W3C** per a Server-Sent Events. Avui l'especificació viu al **HTML Living Standard** del WHATWG |
+| 2015 | HTTP/2 (RFC 7540), amb *server push* |
+| 2018 i 2022 | **RFC 8441** i **RFC 9220**: WebSockets sobre HTTP/2 i sobre HTTP/3 |
+| 2022 | Chrome **desactiva el server push d'HTTP/2** per defecte (Chrome 106) |
+| 2026 | **WebTransport** arriba a tots els navegadors principals; el W3C el publica com a Candidate Recommendation |
 
 ---
 
@@ -376,8 +396,10 @@ La resta:
   supports push notifications"*. Compte amb això: el *server push* d'HTTP/2
   servia per **empènyer recursos a la cache del navegador** (CSS, imatges), no
   per enviar missatges d'aplicació. A més **està desactivat a la pràctica**:
-  Chrome el va treure el 2022 i l'RFC 9113 el desaconsella. **No és una
-  alternativa a SSE ni a WebSockets.**
+  Chrome el va desactivar per defecte a partir de Chrome 106 (2022) perquè
+  només l'usava entre el 0,7% i l'1,25% dels llocs amb HTTP/2 i no donava un
+  guany clar de rendiment; l'alternativa que recomanen per al cas d'ús real és
+  `103 Early Hints`. **No és una alternativa a SSE ni a WebSockets.**
 - **WebTransport** (sobre HTTP/3 i QUIC) — bidireccional, amb fluxos fiables
   *i* datagrames no fiables. És el candidat a succeir WebSockets per a jocs i
   temps real exigent. Encara emergent.
@@ -389,25 +411,18 @@ La resta:
 
 ---
 
-## 10. Guió de 15 minuts
+## 10. Guió i repartiment
 
-| Minuts | Diapositiva | Idea que has de deixar clara |
-| --- | --- | --- |
-| 0:00–1:00 | Portada, El problema | HTTP només sap respondre |
-| 1:00–2:30 | Abans ho simulàvem | Polling i long polling són pedaços |
-| 2:30–4:00 | SSE: què és | No hi ha protocol nou: és una resposta que no s'acaba |
-| 4:00–5:00 | SSE: format del cable | Quatre camps i una línia en blanc |
-| 5:00–6:30 | SSE: reconnexió | Ve de regal, i reprèn |
-| 6:30–8:00 | WS: handshake | El 101 és la frontera |
-| 8:00–9:30 | WS: després del 101 | Ja no és HTTP; el protocol te'l fas tu |
-| 9:30–11:00 | Comparativa | **La diapositiva clau** |
-| 11:00–12:00 | Quan cada un | ChatGPT fa servir SSE |
-| 12:00–13:15 | Arquitectura | El servidor deixa de ser sense estat |
-| 13:15–14:15 | Seguretat | El handshake se salta la Same-Origin Policy |
-| 14:15–15:00 | Conclusions | La regla per triar, i preguntes |
+El cronometratge i el guió diapositiva a diapositiva, repartit entre els 5
+oradors, són a **[`guia_presentacio_websockets_sse.md`](guia_presentacio_websockets_sse.md)**,
+juntament amb les frases de traspàs entre oradors, el mapatge amb la rúbrica i
+la llista de comprovació per als assajos.
 
-A la comparativa **no la llegeixis sencera**: assenyala les tres files que de
-debò decideixen (sentit, reconnexió, complexitat) i segueix.
+Dos avisos que hi trobaràs desenvolupats i que convé saber ja:
+
+- La rúbrica diu **màxim dos oradors**, no cinc.
+- La rúbrica diu **14 minuts ±1**, és a dir una finestra de 13:00 a 15:00:
+  acabar en 10 minuts suspèn aquell criteri igual que passar-se de 15.
 
 ---
 
@@ -421,7 +436,8 @@ codi.
 
 **I HTTP/2 no havia resolt això amb el server push?**
 No. El server push d'HTTP/2 empenyia recursos a la cache, no missatges
-d'aplicació, i a més està desactivat als navegadors des del 2022.
+d'aplicació, i a més Chrome el va desactivar per defecte el 2022 perquè
+l'usava menys de l'1,3% dels llocs i no donava un guany clar de rendiment.
 
 **Com escala això a milions d'usuaris?**
 No escala com HTTP. Cada usuari és una connexió oberta amb estat al servidor.
