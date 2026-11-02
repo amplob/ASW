@@ -1,5 +1,13 @@
 # Solució — Primer Control ASW (dimarts, 4 de novembre de 2025)
 
+> ⚠️ **ATENCIÓ — NOTACIÓ DESFASADA.** Aquest document fa servir una notació
+> **diferent de l'oficial**: l'apartat a) hi és un diagrama de flux i els
+> apartats c) i d) no segueixen WAE2 + MVC. L'anàlisi del problema és correcta,
+> però **la notació no és la que es corregeix**.
+>
+> La notació bona la tens a [`GUIA_EXAMEN_control1.md`](GUIA_EXAMEN_control1.md)
+> i aplicada a [`202526q2_control1_sol.md`](202526q2_control1_sol.md).
+
 Exercici (7 punts) — **programming.dev simplificat**: UX Model i Disseny Intern.
 
 Enunciat original: [`202526q1_control_1.pdf`](202526q1_control_1.pdf)
