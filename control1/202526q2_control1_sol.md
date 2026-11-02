@@ -4,327 +4,418 @@ Exercici (7 punts) — **Directori de Contactes**: UX Model i Disseny Intern.
 
 Enunciat original: [`202526q2_control_1.pdf`](202526q2_control_1.pdf)
 
-Suposicions generals:
+> **Notació.** Aquesta solució segueix la notació de la solució oficial del
+> professor (`teoria/Exercici 4.1 sol.pdf`): l'UX Model és un **diagrama de
+> classes** amb `«screen»` i `«input form»`, i el disseny intern és
+> **WAE2 + MVC**, amb **un diagrama per petició HTTP**. El resum de la notació
+> el tens a [`GUIA_EXAMEN_control1.md`](GUIA_EXAMEN_control1.md).
+>
+> Tres coses que Mermaid no sap dibuixar i que **a mà sí que has de fer**:
+> 1. Els `«input form»` són **classes associatives**, penjades de la fletxa amb
+>    línia discontínua (aquí van enganxats a la screen, que és el més a prop que
+>    Mermaid hi arriba).
+> 2. Les **multiplicitats** de les agregacions van sobre la línia.
+> 3. Les variables d'instància del `«render»` van **entre claus**:
+>    `«render» {@contactes: Set(Contacte)}`. Mermaid peta amb les claus dins
+>    d'una etiqueta, o sigui que als diagrames d'aquí hi surten sense.
 
-- L'usuari (p. ex. "Anna Puig") ja està loguejat; la sessió manté la seva
-  identitat i, per tant, no cal passar-la per la URL.
-- Cada contacte té un **identificador intern enter** (`id`), que no es mostra a
-  l'usuari però que sí que viatja als formularis i a les URLs.
-- Les accions no descrites a l'enunciat (logout, gestió de grups, cerca...)
-  queden fora de l'abast.
+Suposicions:
+
+- L'usuari (p. ex. "Anna Puig") ja està loguejat: la sessió manté la seva
+  identitat.
+- Cada contacte té un **identificador intern enter** que no es mostra.
+- Les accions no descrites (logout, gestió de grups, cerca...) queden fora de
+  l'abast.
+
+### Diagrames renderitzats
+
+Per imprimir o estudiar sense connexió, els vuit diagrames són a
+[`diagrames/`](diagrames/):
+
+| Apartat | Fitxer |
+| --- | --- |
+| a) UX Model | [`1_a_UX_Model.png`](diagrames/1_a_UX_Model.png) |
+| b) Storyboard | [`2_b_Storyboard.png`](diagrames/2_b_Storyboard.png) |
+| c) 1/3 · GET /contactes | [`3_c1_GET_contactes.png`](diagrames/3_c1_GET_contactes.png) |
+| c) 2/3 · GET /contactes/supressio | [`4_c2_GET_supressio.png`](diagrames/4_c2_GET_supressio.png) |
+| c) 3/3 · DELETE (PRG) | [`5_c3_DELETE_PRG.png`](diagrames/5_c3_DELETE_PRG.png) |
+| d) 1/3 · seqüència GET /contactes | [`6_d1_seq_GET_contactes.png`](diagrames/6_d1_seq_GET_contactes.png) |
+| d) 2/3 · seqüència GET supressio | [`7_d2_seq_GET_supressio.png`](diagrames/7_d2_seq_GET_supressio.png) |
+| d) 3/3 · seqüència DELETE (PRG) | [`8_d3_seq_DELETE_PRG.png`](diagrames/8_d3_seq_DELETE_PRG.png) |
 
 ---
 
-## a) [2 punts] Diagrama de flux de navegació (*screens and navigational paths*)
-
-### Diagrama
-
-```mermaid
-flowchart LR
-    START(( )) --> DIR
-
-    DIR["<b>DirectoriContactes</b>"]
-    EDIT["<b>EditaContacte</b>"]
-    CONF["<b>ConfirmaSupressio</b>"]
-
-    DIR -->|"seleccionaGrup(grup)"| DIR
-    DIR -->|"creaNouContacte()"| EDIT
-    DIR -->|"editaContacte(idContacte)"| EDIT
-    DIR -->|"suprimeix(idsSeleccionats)"| CONF
-
-    EDIT -->|"desaCanvis(dades) [dades incorrectes]"| EDIT
-    EDIT -->|"desaCanvis(dades) [dades correctes]"| DIR
-    EDIT -->|"cancella()"| DIR
-
-    CONF -->|"confirma(contrasenya) [contrasenya incorrecta]"| CONF
-    CONF -->|"confirma(contrasenya) [contrasenya correcta]"| DIR
-    CONF -->|"cancella()"| DIR
-```
-
-`DirectoriContactes` és la pantalla inicial.
-
-### Contingut i operacions de cada screen
-
-#### Screen `DirectoriContactes`
-
-Mostra els contactes d'un grup i permet crear-ne, editar-ne i suprimir-ne.
-
-**Informació que conté**
-
-| Dada | Descripció |
-| --- | --- |
-| `usuariLoguejat` | Nom de l'usuari de la sessió (p. ex. "Anna Puig") |
-| `grups` | Llista de tots els grups del directori (nom de cada grup) |
-| `grupSeleccionat` | Grup del qual s'estan mostrant els contactes |
-| `contactes` | Llista de contactes del grup seleccionat; de cadascun: `id` (intern, no visible), nom i dades de resum (càrrec, correu, telèfon...) |
-| `seleccio` | Per a cada contacte, una casella que indica si està marcat |
-
-**Operacions**
-
-| Operació | Efecte |
-| --- | --- |
-| `seleccionaGrup(grup)` | Torna a mostrar aquesta mateixa screen amb els contactes de `grup` |
-| `creaNouContacte()` | Va a `EditaContacte` amb el formulari buit |
-| `editaContacte(idContacte)` | Va a `EditaContacte` amb les dades del contacte `idContacte` |
-| `suprimeix(idsSeleccionats)` | Va a `ConfirmaSupressio` amb els contactes marcats |
-
-#### Screen `EditaContacte`
-
-Formulari per introduir un contacte nou o modificar-ne un d'existent.
-
-**Informació que conté**
-
-| Dada | Descripció |
-| --- | --- |
-| `grup` | Grup al qual pertany (o pertanyerà) el contacte |
-| `idContacte` | Identificador intern del contacte; buit si és un contacte nou |
-| `camps` | Valors actuals de cada camp del contacte (nom, cognoms, càrrec, correu, telèfon...), amb indicació de quins són obligatoris |
-| `missatgeError` | Missatge d'error, si l'últim intent de desar va fallar (opcional) |
-| `campsErronis` | Marca dels camps buits o incorrectes, per ressaltar-los |
-
-Quan es torna a mostrar després d'un error, es **conserven els valors que no
-eren ni buits ni incorrectes**.
-
-**Operacions**
-
-| Operació | Efecte |
-| --- | --- |
-| `desaCanvis(dades)` | Si hi ha camps obligatoris buits, errors de format o violacions d'integritat del domini → torna a `EditaContacte` amb l'error. Si tot és correcte → crea o actualitza el contacte i va a `DirectoriContactes` amb el seu grup |
-| `cancella()` | Va a `DirectoriContactes` amb el grup, sense desar res |
-
-#### Screen `ConfirmaSupressio`
-
-Demana confirmació, amb contrasenya, abans d'eliminar els contactes marcats.
-
-**Informació que conté**
-
-| Dada | Descripció |
-| --- | --- |
-| `grup` | Grup dels contactes que s'eliminaran |
-| `contactesAEliminar` | Llista dels contactes marcats: `id` (intern) i nom |
-| `contrasenya` | Camp d'entrada per a la contrasenya de l'usuari loguejat |
-| `missatgeError` | Missatge d'error si la contrasenya introduïda no era correcta (opcional) |
-
-**Operacions**
-
-| Operació | Efecte |
-| --- | --- |
-| `confirma(contrasenya)` | Si la contrasenya és incorrecta → torna a `ConfirmaSupressio` amb l'error. Si és correcta → elimina els contactes i va a `DirectoriContactes` amb la resta de contactes del grup |
-| `cancella()` | Va a `DirectoriContactes` amb el grup, sense eliminar res |
-
----
-
-## b) [1 punt] Diagrama d'escenari d'interacció (*storyboard sequence*)
-
-Escenari: l'usuari loguejat va a veure els contactes del grup **"Missatgers"** i
-elimina de cop **tres contactes**, encertant la contrasenya al primer intent.
-
-```mermaid
-sequenceDiagram
-    actor U as Anna Puig
-    participant DIR as DirectoriContactes
-    participant CONF as ConfirmaSupressio
-
-    Note over U,DIR: L'usuari està veient el directori (grup "Dept. Comercial")
-    U ->> DIR: seleccionaGrup("Missatgers")
-    DIR -->> U: DirectoriContactes<br/>(grups, grup="Missatgers", contactes del grup)
-
-    Note over U: Marca les caselles de 3 contactes (ids 3, 7, 12)
-    U ->> DIR: suprimeix([3, 7, 12])
-    DIR -->> U: ConfirmaSupressio<br/>(grup="Missatgers", els 3 contactes, camp contrasenya)
-
-    U ->> CONF: confirma("••••••") — contrasenya correcta
-    CONF -->> U: DirectoriContactes<br/>(grup="Missatgers", contactes restants)
-```
-
-Com que la contrasenya és correcta al primer intent, l'escenari no passa mai
-pels camins de retorn a la mateixa screen amb missatge d'error.
-
----
-
-## c) [2 punts] Diagrama de classes del disseny intern (capa de presentació, MVC)
-
-Abast: només l'escenari de l'apartat b). Ruta inicial `GET /contactes?grup=Missatgers`.
-
-### Rutes implicades en l'escenari
-
-| # | Petició HTTP | Controlador :: acció | Resultat |
-| --- | --- | --- | --- |
-| 1 | `GET /contactes?grup=Missatgers` | `ContactesController::index` | Renderitza `VistaDirectoriContactes` |
-| 2 | `GET /contactes/supressio?grup=Missatgers&ids=3,7,12` | `ContactesController::confirmaSupressio` | Renderitza `VistaConfirmaSupressio` |
-| 3 | `DELETE /contactes?grup=Missatgers`<br/>(cos: `ids=3,7,12`, `contrasenya`) | `ContactesController::destroy` | Elimina i redirigeix (303) a la ruta 1 |
-
-Notes de disseny:
-
-- Les peticions 1 i 2 són **segures** (només llegeixen i mostren informació):
-  s'implementen amb `GET`. La 3 modifica l'estat i s'implementa amb `DELETE`;
-  com que els formularis HTML només envien `GET`/`POST`, a la pràctica es
-  fa amb un `POST` i un camp ocult `_method=DELETE` que el *front controller*
-  interpreta.
-- La contrasenya viatja **al cos** de la petició, mai a la URL.
-- Després d'eliminar s'aplica **POST/Redirect/GET**: es respon `303 See Other`
-  cap a `GET /contactes?grup=Missatgers`, de manera que recarregar la pàgina no
-  reintenta l'eliminació.
-
-### Diagrama de classes
+## a) [2 punts] UX Model: Screens & Navigational Paths
 
 ```mermaid
 classDiagram
     direction LR
 
-    class FrontController {
-        <<controller>>
-        +encamina(peticio) Resposta
+    class DirectoriContactes {
+        <<screen>>
+        usuariLoguejat : String
+        grupSeleccionat : String
+        seleccionaGrup()
+        creaContacte()
+        editaContacte()
+        suprimeix()
     }
 
-    class ContactesController {
-        <<controller>>
-        +index(grup) Resposta
-        +confirmaSupressio(grup, ids) Resposta
-        +destroy(grup, ids, contrasenya) Resposta
+    class EditaContacte {
+        <<screen>>
+        grup : String
+        missatgeError : String [0..1]
+        desa()
+        cancella()
     }
 
-    class Sessio {
-        <<controller>>
-        +usuariLoguejat() Usuari
+    class ConfirmaSupressio {
+        <<screen>>
+        grup : String
+        missatgeError : String [0..1]
+        confirma()
+        cancella()
     }
 
-    class VistaDirectoriContactes {
-        <<view>>
-        +render(usuari, grups, grupSel, contactes) HTML
+    class Grup {
+        nom : String
     }
 
-    class VistaConfirmaSupressio {
-        <<view>>
-        +render(grup, contactes, missatgeError) HTML
+    class Contacte {
+        nom : String
+        carrec : String
+        correu : String
+        telefon : String
     }
 
-    class ServeiDirectori {
-        <<model>>
-        +obteGrups() List~GrupDTO~
-        +obteContactesDelGrup(grup) List~ContacteDTO~
-        +obteContactes(ids) List~ContacteDTO~
-        +eliminaContactes(usuari, contrasenya, ids) void
+    class SeleccioForm {
+        <<input form>>
+        selectContacte : checkbox [*]
     }
 
-    class ContacteDTO {
-        <<model>>
-        +int id
-        +String nom
-        +String carrec
-        +String correu
-        +String telefon
+    class ContacteForm {
+        <<input form>>
+        nom : text
+        cognoms : text
+        carrec : text
+        correu : text
+        telefon : text
     }
 
-    class GrupDTO {
-        <<model>>
-        +String nom
+    class ConfirmaForm {
+        <<input form>>
+        contrasenya : password
     }
 
-    FrontController --> ContactesController : delega segons la ruta
-    ContactesController --> Sessio : usuari loguejat
-    ContactesController --> ServeiDirectori : consulta i modifica
-    ContactesController --> VistaDirectoriContactes : renderitza
-    ContactesController --> VistaConfirmaSupressio : renderitza
-    ServeiDirectori ..> ContacteDTO : retorna
-    ServeiDirectori ..> GrupDTO : retorna
-    VistaDirectoriContactes ..> ContacteDTO : mostra
-    VistaDirectoriContactes ..> GrupDTO : mostra
-    VistaConfirmaSupressio ..> ContacteDTO : mostra
+    DirectoriContactes o-- Grup : *
+    DirectoriContactes o-- Contacte : *
+    EditaContacte o-- Contacte : 0..1
+    ConfirmaSupressio o-- Contacte : *
+
+    DirectoriContactes --> DirectoriContactes : Selecciona grup
+    DirectoriContactes --> EditaContacte : Crea / Edita
+    DirectoriContactes --> ConfirmaSupressio : Suprimeix
+    EditaContacte --> EditaContacte : Desa [error]
+    EditaContacte --> DirectoriContactes : Desa [ok] / Cancella
+    ConfirmaSupressio --> ConfirmaSupressio : Confirma [error]
+    ConfirmaSupressio --> DirectoriContactes : Confirma [ok] / Cancella
+
+    SeleccioForm .. DirectoriContactes
+    ContacteForm .. EditaContacte
+    ConfirmaForm .. ConfirmaSupressio
 ```
 
-### Repartiment de responsabilitats MVC
+**Els formularis són classes associatives.** A mà, cadascun penja amb línia
+discontínua **de la fletxa**, no de la caixa:
 
-- **Controlador** (`FrontController`, `ContactesController`): rep la petició
-  HTTP, n'extreu i valida els paràmetres (`grup`, `ids`, `contrasenya`), decideix
-  quina operació del model cal invocar i quina vista s'ha de renderitzar (o si
-  cal redirigir). No conté lògica de negoci ni genera HTML.
-- **Model** (`ServeiDirectori` + DTOs): és la **façana de la capa de domini**
-  vista des de la presentació. Conté la lògica de negoci (comprovar la
-  contrasenya, eliminar contactes) i és totalment independent d'HTTP.
-- **Vista** (`VistaDirectoriContactes`, `VistaConfirmaSupressio`): genera l'HTML
-  a partir de les dades que li passa el controlador. Només llegeix dades; no
-  crida mai el model per modificar res.
+| `«input form»` | Penja del camí |
+| --- | --- |
+| `SeleccioForm` | `DirectoriContactes → ConfirmaSupressio` (*Suprimeix*) |
+| `ContacteForm` | `EditaContacte → DirectoriContactes` i el bucle d'error |
+| `ConfirmaForm` | `ConfirmaSupressio → DirectoriContactes` i el bucle d'error |
 
-> **Fora de l'escenari b)** — per completar tota la funcionalitat de l'apartat a)
-> caldria afegir `ContactesController::nou`, `::edit`, `::create` i `::update`
-> amb la vista `VistaEditaContacte` sobre les rutes
-> `GET /contactes/nou?grup=…`, `GET /contactes/{id}/edicio`,
-> `POST /contactes` i `PUT /contactes/{id}`.
+**Informació i operacions de cada screen** (el que l'enunciat demana
+«clarament»):
+
+| Screen | Informació | Operacions |
+| --- | --- | --- |
+| `DirectoriContactes` | Usuari loguejat · tots els grups · grup seleccionat · els contactes d'aquell grup, cadascun amb una casella de selecció | `seleccionaGrup()` · `creaContacte()` · `editaContacte()` · `suprimeix()` |
+| `EditaContacte` | Grup · el contacte que s'edita (buit si és nou) · missatge d'error opcional | `desa()` · `cancella()` |
+| `ConfirmaSupressio` | Grup · els contactes marcats per eliminar · camp de contrasenya · missatge d'error opcional | `confirma()` · `cancella()` |
+
+Dos detalls de l'enunciat que decideixen el diagrama:
+
+- `EditaContacte` **conserva els valors** correctes quan hi ha error;
+  `ConfirmaSupressio` es torna a mostrar **amb els camps buits**.
+- `EditaContacte o-- Contacte : 0..1` — el **0..1** és perquè quan crees un
+  contacte nou la screen no en té cap.
 
 ---
 
-## d) [2 punts] Diagrama de seqüència del disseny intern (capa de presentació)
+## b) [1 punt] Storyboard Sequence
 
-Escenari de l'apartat b). Tres peticions HTTP consecutives (la tercera acaba
-amb una redirecció que provoca una quarta petició, idèntica a la primera).
+Escenari: l'usuari va a veure els contactes del grup "Missatgers" i elimina de
+cop tres contactes, encertant la contrasenya.
 
 ```mermaid
 sequenceDiagram
-    participant NAV as Navegador
-    participant FC as FrontController
-    participant CC as ContactesController
-    participant SE as Sessio
-    participant SD as ServeiDirectori
-    participant VD as VistaDirectoriContactes
-    participant VC as VistaConfirmaSupressio
+    actor U as ": Usuari"
+    participant D1 as "«screen» : DirectoriContactes"
+    participant C as "«screen» : ConfirmaSupressio"
+    participant D2 as "«screen» : DirectoriContactes"
 
-    Note over NAV,VD: 1) Veure els contactes del grup "Missatgers"
-    NAV ->> FC: GET /contactes?grup=Missatgers
-    FC ->> CC: index("Missatgers")
-    CC ->> SE: usuariLoguejat()
-    SE -->> CC: usuari ("Anna Puig")
-    CC ->> SD: obteGrups()
-    SD -->> CC: grups
-    CC ->> SD: obteContactesDelGrup("Missatgers")
-    SD -->> CC: contactes
-    CC ->> VD: render(usuari, grups, "Missatgers", contactes)
-    VD -->> CC: html
-    CC -->> FC: 200 OK, html
-    FC -->> NAV: 200 OK, html
+    U ->> D1: navigate()
+    U ->> D1: / marca 3 contactes /
+    U ->> D1: suprimeix()
+    D1 ->> C: navigate()
+    U ->> C: / fill form /
+    U ->> C: confirma()
+    C ->> D2: navigate()
+```
 
-    Note over NAV,VC: 2) Marca 3 contactes i prem "Suprimeix"
-    NAV ->> FC: GET /contactes/supressio?grup=Missatgers&ids=3,7,12
-    FC ->> CC: confirmaSupressio("Missatgers", [3,7,12])
-    CC ->> SD: obteContactes([3,7,12])
-    SD -->> CC: contactes
-    CC ->> VC: render("Missatgers", contactes, null)
-    VC -->> CC: html
-    CC -->> FC: 200 OK, html
-    FC -->> NAV: 200 OK, html
+Fixa't en les tres regles de la notació: les screens són **instàncies**, el
+canvi de pantalla és un **`navigate()` de screen a screen**, i com que es torna
+al directori **hi ha una segona lifeline** del mateix tipus. **No hi ha fletxes
+de retorn.**
 
-    Note over NAV,SD: 3) Introdueix la contrasenya correcta i prem "Confirma"
-    NAV ->> FC: DELETE /contactes?grup=Missatgers<br/>(ids=3,7,12, contrasenya)
-    FC ->> CC: destroy("Missatgers", [3,7,12], contrasenya)
-    CC ->> SE: usuariLoguejat()
-    SE -->> CC: usuari ("Anna Puig")
-    CC ->> SD: eliminaContactes(usuari, contrasenya, [3,7,12])
-    SD -->> CC: ok
-    CC -->> FC: 303 See Other<br/>Location: /contactes?grup=Missatgers
-    FC -->> NAV: 303 See Other
+---
 
-    Note over NAV,VD: 4) El navegador segueix la redirecció (= petició 1)
-    NAV ->> FC: GET /contactes?grup=Missatgers
-    FC ->> CC: index("Missatgers")
-    CC ->> SD: obteContactesDelGrup("Missatgers")
-    SD -->> CC: contactes restants
-    CC ->> VD: render(usuari, grups, "Missatgers", contactes restants)
-    VD -->> CC: html
-    CC -->> FC: 200 OK, html
-    FC -->> NAV: 200 OK, html
+## c) [2 punts] Disseny intern: diagrama de classes (WAE2 + MVC)
+
+L'escenari té **tres peticions** (la tercera redirigeix a la primera), o sigui
+**tres diagrames**.
+
+### Rutes
+
+| # | Petició | Controlador :: acció | Resultat |
+| --- | --- | --- | --- |
+| 1 | `GET /contactes?grup=Missatgers` | `ContacteCtrl::index` | Renderitza `ContactesView` |
+| 2 | `GET /contactes/supressio?grup=Missatgers&ids=3,7,12` | `ContacteCtrl::confirmDelete` | Renderitza `ConfirmaView` |
+| 3 | `DELETE /contactes` (cos: `ids`, `contrasenya`) | `ContacteCtrl::destroyMany` | **Redirigeix** a la ruta 1 |
+
+Les peticions 1 i 2 són **segures**; la 3 modifica i per tant no renderitza
+vista: **`«redirect»`**. La contrasenya va **al cos**, mai a la URL.
+
+### 1/3 · `GET /contactes?grup=Missatgers`
+
+```mermaid
+classDiagram
+    direction LR
+
+    class ContacteCtrl {
+        <<controller>>
+        index()
+        confirmDelete()
+        destroyMany()
+    }
+    class ContactesView {
+        <<view>>
+    }
+    class contactes_html["contactes.html"] {
+        <<client page>>
+    }
+    class SeleccioForm {
+        <<form>>
+        selectContacte : checkbox [*]
+    }
+    class Session {
+        usuari : String
+    }
+    class Contacte {
+        <<model>>
+        id
+        nom : String
+        carrec : String
+        correu : String
+        telefon : String
+        grup : Grup
+        findByGrup(nom : String) Set~Contacte~
+        save()
+        destroy()
+    }
+
+    ContacteCtrl --> ContactesView : «render» @contactes
+    ContactesView --> contactes_html : «builds»
+    contactes_html *-- SeleccioForm
+    ContacteCtrl ..> Session : «use»
+    ContactesView ..> Session : «use»
+    ContacteCtrl ..> Contacte : «use»
+    ContactesView ..> Contacte : «use»
+```
+
+A mà, afegeix-hi la fletxa d'entrada **`«GET» /contactes?grup=Missatgers`** cap
+al controlador.
+
+### 2/3 · `GET /contactes/supressio?grup=Missatgers&ids=3,7,12`
+
+```mermaid
+classDiagram
+    direction LR
+
+    class SeleccioForm {
+        <<form>>
+        selectContacte : checkbox [*]
+    }
+    class ContacteCtrl {
+        <<controller>>
+        confirmDelete()
+    }
+    class ConfirmaView {
+        <<view>>
+    }
+    class confirma_html["confirma.html"] {
+        <<client page>>
+    }
+    class ConfirmaForm {
+        <<form>>
+        contrasenya : password
+    }
+    class Session {
+        usuari : String
+    }
+    class Contacte {
+        <<model>>
+        findByIds(ids) Set~Contacte~
+    }
+
+    SeleccioForm --> ContacteCtrl : «submit» /contactes/supressio
+    ContacteCtrl --> ConfirmaView : «render» @contactes
+    ConfirmaView --> confirma_html : «builds»
+    confirma_html *-- ConfirmaForm
+    ContacteCtrl ..> Session : «use»
+    ContacteCtrl ..> Contacte : «use»
+    ConfirmaView ..> Contacte : «use»
+```
+
+### 3/3 · `DELETE /contactes` — el patró PRG
+
+```mermaid
+classDiagram
+    direction LR
+
+    class ConfirmaForm {
+        <<form>>
+        contrasenya : password
+    }
+    class ContacteCtrl {
+        <<controller>>
+        destroyMany()
+    }
+    class Session {
+        usuari : String
+    }
+    class Contacte {
+        <<model>>
+        findByIds(ids) Set~Contacte~
+        destroy()
+    }
+
+    ConfirmaForm --> ContacteCtrl : «submit» /contactes
+    ContacteCtrl --> ContacteCtrl : «redirect» /contactes?grup=Missatgers
+    ContacteCtrl ..> Session : «use»
+    ContacteCtrl ..> Contacte : «use»
+```
+
+**Cap vista i cap `«builds»`.** La petició que escriu acaba amb el bucle
+`«redirect»` sobre el mateix controlador. És el que la taula de rutes marca com
+a «— (PRG)».
+
+---
+
+## d) [2 punts] Disseny intern: diagrama de seqüència
+
+Un per petició, igual que a c).
+
+### 1/3 · `GET /contactes?grup=Missatgers`
+
+```mermaid
+sequenceDiagram
+    actor U as ": Usuari"
+    participant CC as "«controller» : ContacteCtrl"
+    participant SE as ": Session"
+    participant M as "«model» Contacte"
+    participant V as "«view» : ContactesView"
+    participant I as "«model» c : Contacte"
+    participant P as "«client page» : contactes.html"
+
+    U ->> CC: # GET /contactes?grup=Missatgers
+    CC ->> CC: index()
+    CC ->> SE: get("usuari")
+    SE -->> CC: u
+    CC ->> M: findByGrup(nom="Missatgers")
+    M -->> CC: @contactes
+    CC ->> V: # render @contactes
+    loop c in @contactes
+        V ->> I: get*()
+        I -->> V: 
+    end
+    V -->> P: # builds
+    V -->> CC: 
+    CC -->> U: 
+```
+
+### 2/3 · `GET /contactes/supressio?...`
+
+```mermaid
+sequenceDiagram
+    actor U as ": Usuari"
+    participant F as "«form» : SeleccioForm"
+    participant CC as "«controller» : ContacteCtrl"
+    participant M as "«model» Contacte"
+    participant V as "«view» : ConfirmaView"
+    participant I as "«model» c : Contacte"
+    participant P as "«client page» : confirma.html"
+
+    U ->> F: # submit /contactes/supressio
+    F ->> CC: # GET /contactes/supressio?grup=Missatgers&ids=3,7,12
+    CC ->> CC: confirmDelete()
+    CC ->> M: findByIds(ids=[3,7,12])
+    M -->> CC: @contactes
+    CC ->> V: # render @contactes
+    loop c in @contactes
+        V ->> I: get*()
+        I -->> V: 
+    end
+    V -->> P: # builds
+    V -->> CC: 
+    CC -->> U: 
+```
+
+### 3/3 · `DELETE /contactes` — PRG
+
+```mermaid
+sequenceDiagram
+    actor U as ": Usuari"
+    participant F as "«form» : ConfirmaForm"
+    participant CC as "«controller» : ContacteCtrl"
+    participant SE as ": Session"
+    participant M as "«model» Contacte"
+    participant I as "«model» c : Contacte"
+
+    U ->> F: # submit /contactes
+    F ->> CC: # DELETE /contactes (ids, contrasenya)
+    CC ->> CC: destroyMany()
+    CC ->> SE: get("usuari")
+    SE -->> CC: u
+    CC ->> M: findByIds(ids=[3,7,12])
+    M -->> CC: @contactes
+    loop c in @contactes
+        CC ->> I: destroy()
+        I -->> CC: 
+    end
+    CC -->> U: # redirect /contactes?grup=Missatgers
 ```
 
 ### Observacions
 
-- **POST/Redirect/GET**: la petició 3 no renderitza cap vista; respon amb
-  `303 See Other`. Això evita que una recàrrega del navegador reenviï
-  l'eliminació i fa que la URL final (`/contactes?grup=Missatgers`) sigui
-  compartible i marcable.
-- **Autenticació de l'acció**: la verificació de la contrasenya la fa el
-  **model** (`ServeiDirectori.eliminaContactes`), no el controlador: és una
-  regla de negoci. Si fos incorrecta, el model llançaria una excepció i el
-  controlador renderitzaria `VistaConfirmaSupressio` amb el missatge d'error
-  (camí que aquest escenari no recorre).
-- **Sense estat al servidor entre peticions**: els identificadors dels contactes
-  a eliminar viatgen dins del formulari de `ConfirmaSupressio` (camps ocults),
-  no es guarden a la sessió.
+- **POST/Redirect/GET**: la petició 3 no renderitza res; respon amb el
+  `# redirect`, i el navegador repeteix la petició 1. Recarregar no torna a
+  esborrar.
+- **La contrasenya la valida el model**, no el controlador: és regla de negoci.
+  Si fos incorrecta, el model llançaria una excepció i el controlador
+  renderitzaria `ConfirmaView` amb l'error i els camps buits — camí que aquest
+  escenari no recorre.
+- **El model apareix dues vegades**: com a **classe** per als *finders*
+  (`findByGrup`, `findByIds`) i com a **instància** per a `get*()` i `destroy()`.
+- El fragment **`loop`** és el que fa la vista per pintar cada fila, i el que fa
+  el controlador per esborrar cada contacte.
